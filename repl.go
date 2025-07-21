@@ -5,9 +5,17 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/tylerBrittain42/pokemonWeaknessCalculator/internal/pokeapi"
 )
 
-func startRepl() {
+type config struct {
+	pokeapiClient   pokeapi.Client
+	nextLocationURL *string
+	prevLocationURL *string
+}
+
+func startRepl(cfg *config) {
 
 	fmt.Print("start:")
 	scanner := bufio.NewScanner(os.Stdin)
@@ -18,7 +26,10 @@ func startRepl() {
 		sanitizedInput := cleanInput(input)
 		command := sanitizedInput[0]
 		if val, ok := getCommands()[command]; ok {
-			val.callback()
+			err := val.callback(cfg)
+			if err != nil {
+				fmt.Println(err)
+			}
 		} else {
 			fmt.Println("Unknown command")
 		}
@@ -34,7 +45,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -48,6 +59,16 @@ func getCommands() map[string]cliCommand {
 			name:        "help",
 			description: "Displays a help message",
 			callback:    commandHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "Displays the next 20 locations",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandMapb,
 		},
 	}
 }
