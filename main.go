@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"strings"
+
+	pokewrapper "github.com/tylerBrittain42/pokemonWeaknessCalculator/pkg/pokeWrapper"
 )
 
 func main() {
-	fmt.Println("Hello")
+	pokewrapper.Foo()
 }
 
 func cleanInput(text string) []string {
