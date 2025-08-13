@@ -1,14 +1,22 @@
 package pokewrapper
 
 import (
-	"fmt"
-	"io"
+	"encoding/json"
+	"errors"
 	"net/http"
+	"strings"
 )
 
-func getType(name string) ([2]string, error) {
-	var result [2]string
-	return result, nil
+func cleanInput(name string) (string, error) {
+	trimmed := strings.TrimSpace(name)
+	if trimmed == "" {
+		return "", errors.New("empty string was given as name")
+	}
+	final := strings.ToLower(strings.ReplaceAll(trimmed, " ", "-"))
+
+	return final, nil
+
+}
 
 }
 
