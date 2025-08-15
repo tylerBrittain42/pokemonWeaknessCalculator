@@ -102,15 +102,80 @@ func getPokemonTypeInteraction(name string) (TypeInteractions, error) {
 		return TypeInteractions{}, err
 	}
 
-	if len(types) == 1 {
-		interactions, err := getPureTypeInteraction(types[0])
-		if err != nil {
-			return TypeInteractions{}, err
-		}
-		return TypeInteractions{HalfDamageFrom: interactions.HalfDamageFrom, DoubleDamageFrom: interactions.DoubleDamageFrom, NoDamageFrom: interactions.NoDamageFrom}, nil
+	firstTypeInteractions, err := getPureTypeInteraction(types[0])
+	if err != nil {
+		return TypeInteractions{}, err
 	}
 
-	return TypeInteractions{}, nil
+	if len(types) == 1 {
+		return TypeInteractions{HalfDamageFrom: firstTypeInteractions.HalfDamageFrom, DoubleDamageFrom: firstTypeInteractions.DoubleDamageFrom, NoDamageFrom: firstTypeInteractions.NoDamageFrom}, nil
+	}
+
+	secondTypeInteractions, err := getPureTypeInteraction(types[1])
+	if err != nil {
+		return TypeInteractions{}, err
+	}
+
+	// todo: consider doing similar to the slice checker but use
+	// nonexistent as normal
+	// 1 as double
+	// 2 as quad
+	// -1 as half
+	// -2 as quarter
+	// check for immune at end
+	combinedTypeInteractionsMap := make(map[string]float32)
+	updateTypeMap(combinedTypeInteractionsMap, firstTypeInteractions)
+	updateTypeMap(combinedTypeInteractionsMap, secondTypeInteractions)
+
+	var finalTypeInteractions TypeInteractions
+	for key, val := range combinedTypeInteractionsMap {
+		switch val {
+		case 0.25:
+			finalTypeInteractions.QuarterDamageFrom = append(finalTypeInteractions.QuarterDamageFrom, key)
+		case 0.5:
+			finalTypeInteractions.HalfDamageFrom = append(finalTypeInteractions.HalfDamageFrom, key)
+		case 1:
+			continue
+		case 2:
+			finalTypeInteractions.DoubleDamageFrom = append(finalTypeInteractions.DoubleDamageFrom, key)
+		case 4:
+			finalTypeInteractions.QuadDamageFrom = append(finalTypeInteractions.QuadDamageFrom, key)
+		}
+	}
+
+	return finalTypeInteractions, nil
+
+}
+
+// m = typeMap
+// i = pureTypeInteractions
+func updateTypeMap(m map[string]float32, i PureTypeInteractions) {
+	// in cases where the type does not have a value, we set it,
+	// otherwise we treat it as a multiplier
+	for _, v := range i.DoubleDamageFrom {
+		if _, ok := m[v]; !ok {
+			m[v] = 2
+		} else {
+			m[v] *= 2
+		}
+
+	}
+	for _, v := range i.HalfDamageFrom {
+		if _, ok := m[v]; !ok {
+			m[v] = 0.5
+		} else {
+			m[v] *= 0.5
+		}
+
+	}
+	for _, v := range i.NoDamageFrom {
+		if _, ok := m[v]; !ok {
+			m[v] = 0
+		} else {
+			m[v] *= 0
+		}
+
+	}
 
 }
 

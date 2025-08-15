@@ -210,11 +210,23 @@ func TestGetPokemonTypeInteractionFullPokemon(t *testing.T) {
 		types    TypeInteractions
 	}{
 		{
-			caseName: "single type",
+			caseName: "single-type",
 			pokemon:  "furret",
 			types: TypeInteractions{
 				DoubleDamageFrom: []string{"fighting"},
 				NoDamageFrom:     []string{"ghost"},
+			},
+		}, {
+			caseName: "dual-type",
+			pokemon:  "nuzleaf",
+			types: TypeInteractions{
+				QuadDamageFrom:   []string{"bug"},
+				DoubleDamageFrom: []string{"fighting", "flying", "poison", "fire", "ice", "fairy"},
+				HalfDamageFrom: []string{
+					"ground", "ghost", "water", "grass", "electric", "dark",
+				},
+				QuarterDamageFrom: []string{},
+				NoDamageFrom:      []string{},
 			},
 		},
 	}
