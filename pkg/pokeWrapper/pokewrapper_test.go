@@ -1,6 +1,7 @@
 package pokewrapper
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -158,5 +159,38 @@ func TestGetType(t *testing.T) {
 
 }
 
-// get strength and weakness of tyhpe
-// get type info of specific pokemon
+func TestGetTypeInteraction(t *testing.T) {
+	cases := []struct {
+		caseName     string
+		inputType    string
+		interactions TypeInteractions
+	}{
+		{
+			caseName:  "Ghost type interactions",
+			inputType: "ghost",
+			interactions: TypeInteractions{
+				DoubleDamageFrom: []string{"ghost", "dark"},
+				HalfDamageFrom:   []string{"poison", "bug"},
+				NoDamageFrom:     []string{"normal", "fighting"},
+			},
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.caseName, func(t *testing.T) {
+			output, err := getTypeInteraction(tt.inputType)
+			if err != nil {
+				t.Errorf("Encountered error: %v", err)
+			}
+			if !reflect.DeepEqual(output.DoubleDamageFrom, tt.interactions.DoubleDamageFrom) {
+				t.Errorf("Double damage from: got %v expectedc %v", output.DoubleDamageFrom, tt.interactions.DoubleDamageFrom)
+			} else if !reflect.DeepEqual(output.HalfDamageFrom, tt.interactions.HalfDamageFrom) {
+				t.Errorf("Half damage from: got %v expectedc %v", output.HalfDamageFrom, tt.interactions.HalfDamageFrom)
+			} else if !reflect.DeepEqual(output.NoDamageFrom, tt.interactions.NoDamageFrom) {
+				t.Errorf("No damage: got %v expectedc %v", output.NoDamageFrom, tt.interactions.NoDamageFrom)
+			}
+
+		},
+		)
+	}
+
+}

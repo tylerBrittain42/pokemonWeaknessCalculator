@@ -30,7 +30,7 @@ func getType(name string) ([]string, error) {
 	url := "https://" + domain + "pokemon/" + name
 	resp, err := http.Get(url)
 	if err != nil {
-		return []string{}, nil
+		return []string{}, err
 	}
 
 	if resp.StatusCode != 200 {
@@ -51,6 +51,57 @@ func getType(name string) ([]string, error) {
 
 	return types, nil
 
+}
+
+func getTypeInteraction(elementType string) (TypeInteractions, error) {
+	// One reusable type for name objects from PokeAPI
+
+	// Your main type for decoding the GET request
+	type respType struct {
+		DamageRelations struct {
+			DoubleDamageFrom []DamageTypeInfo `json:"double_damage_from"`
+			HalfDamageFrom   []DamageTypeInfo `json:"half_damage_from"`
+			NoDamageFrom     []DamageTypeInfo `json:"no_damage_from"`
+		} `json:"damage_relations"`
+	}
+	var typeChart respType
+
+	url := "https://" + domain + "type/" + elementType
+	resp, err := http.Get(url)
+	if err != nil {
+		return TypeInteractions{}, err
+	}
+
+	if resp.StatusCode != 200 {
+		return TypeInteractions{}, fmt.Errorf("unable to find match for: %s", elementType)
+	}
+
+	defer resp.Body.Close()
+	decoder := json.NewDecoder(resp.Body)
+	err = decoder.Decode(&typeChart)
+	if err != nil {
+		return TypeInteractions{}, err
+	}
+	interactions := TypeInteractions{
+		DoubleDamageFrom: stripKey(typeChart.DamageRelations.DoubleDamageFrom),
+		HalfDamageFrom:   stripKey(typeChart.DamageRelations.HalfDamageFrom),
+		NoDamageFrom:     stripKey(typeChart.DamageRelations.NoDamageFrom),
+	}
+	return interactions, nil
+
+}
+
+func getPokemonTypeInteraction(name string) (string, error) {
+	return "", nil
+
+}
+
+func stripKey(items []DamageTypeInfo) []string {
+	stripped := []string{}
+	for _, v := range items {
+		stripped = append(stripped, v.Name)
+	}
+	return stripped
 }
 
 func Foo() {

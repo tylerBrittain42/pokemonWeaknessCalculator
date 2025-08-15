@@ -271,3 +271,13 @@ type Pokemon struct {
 	} `json:"types"`
 	Weight int `json:"weight"`
 }
+
+type TypeInteractions struct {
+	DoubleDamageFrom []string
+	HalfDamageFrom   []string
+	NoDamageFrom     []string
+}
+
+type DamageTypeInfo struct {
+	Name string `json:"name"`
+}
