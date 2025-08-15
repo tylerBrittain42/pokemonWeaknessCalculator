@@ -272,10 +272,22 @@ type Pokemon struct {
 	Weight int `json:"weight"`
 }
 
-type TypeInteractions struct {
+// Pure type interactions do not account for dual-typing
+// meaning no quad or quarter damage
+type PureTypeInteractions struct {
 	DoubleDamageFrom []string
 	HalfDamageFrom   []string
 	NoDamageFrom     []string
+}
+
+// Type interactions account for dual-typing
+// meaning both quad and quarter damage are accounted for
+type TypeInteractions struct {
+	QuadDamageFrom    []string
+	DoubleDamageFrom  []string
+	HalfDamageFrom    []string
+	QuarterDamageFrom []string
+	NoDamageFrom      []string
 }
 
 type DamageTypeInfo struct {

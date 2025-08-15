@@ -53,7 +53,7 @@ func getType(name string) ([]string, error) {
 
 }
 
-func getTypeInteraction(elementType string) (TypeInteractions, error) {
+func getPureTypeInteraction(elementType string) (PureTypeInteractions, error) {
 	// One reusable type for name objects from PokeAPI
 
 	// Your main type for decoding the GET request
@@ -69,20 +69,20 @@ func getTypeInteraction(elementType string) (TypeInteractions, error) {
 	url := "https://" + domain + "type/" + elementType
 	resp, err := http.Get(url)
 	if err != nil {
-		return TypeInteractions{}, err
+		return PureTypeInteractions{}, err
 	}
 
 	if resp.StatusCode != 200 {
-		return TypeInteractions{}, fmt.Errorf("unable to find match for: %s", elementType)
+		return PureTypeInteractions{}, fmt.Errorf("unable to find match for: %s", elementType)
 	}
 
 	defer resp.Body.Close()
 	decoder := json.NewDecoder(resp.Body)
 	err = decoder.Decode(&typeChart)
 	if err != nil {
-		return TypeInteractions{}, err
+		return PureTypeInteractions{}, err
 	}
-	interactions := TypeInteractions{
+	interactions := PureTypeInteractions{
 		DoubleDamageFrom: stripKey(typeChart.DamageRelations.DoubleDamageFrom),
 		HalfDamageFrom:   stripKey(typeChart.DamageRelations.HalfDamageFrom),
 		NoDamageFrom:     stripKey(typeChart.DamageRelations.NoDamageFrom),
@@ -91,8 +91,26 @@ func getTypeInteraction(elementType string) (TypeInteractions, error) {
 
 }
 
-func getPokemonTypeInteraction(name string) (string, error) {
-	return "", nil
+func getPokemonTypeInteraction(name string) (TypeInteractions, error) {
+	sanitizedName, err := cleanInput(name)
+	if err != nil {
+		return TypeInteractions{}, err
+	}
+
+	types, err := getType(sanitizedName)
+	if err != nil {
+		return TypeInteractions{}, err
+	}
+
+	if len(types) == 1 {
+		interactions, err := getPureTypeInteraction(types[0])
+		if err != nil {
+			return TypeInteractions{}, err
+		}
+		return TypeInteractions{HalfDamageFrom: interactions.HalfDamageFrom, DoubleDamageFrom: interactions.DoubleDamageFrom, NoDamageFrom: interactions.NoDamageFrom}, nil
+	}
+
+	return TypeInteractions{}, nil
 
 }
 
