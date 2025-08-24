@@ -232,7 +232,7 @@ func TestGetPokemonTypeInteractionFullPokemon(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.caseName, func(t *testing.T) {
-			output, err := getPokemonTypeInteraction(tt.pokemon)
+			output, err := GetPokemonTypeInteraction(tt.pokemon)
 			if err != nil {
 				t.Errorf("Encountered error: %v", err)
 			}
@@ -279,7 +279,7 @@ func TestGetPokemonTypeInteractionQuad(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.caseName, func(t *testing.T) {
-			output, err := getPokemonTypeInteraction(tt.pokemon)
+			output, err := GetPokemonTypeInteraction(tt.pokemon)
 			if err != nil {
 				t.Errorf("Encountered error: %v", err)
 			}

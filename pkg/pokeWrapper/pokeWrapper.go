@@ -91,7 +91,7 @@ func getPureTypeInteraction(elementType string) (PureTypeInteractions, error) {
 
 }
 
-func getPokemonTypeInteraction(name string) (TypeInteractions, error) {
+func GetPokemonTypeInteraction(name string) (TypeInteractions, error) {
 	sanitizedName, err := cleanInput(name)
 	if err != nil {
 		return TypeInteractions{}, err
